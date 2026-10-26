@@ -1,0 +1,4 @@
+interface:
+  display_name: "数学核心定义名称提取"
+  short_description: "从数学书籍的书末索引筛选核心概念，生成简朴清晰的 LaTeX 名称清单"
+  default_prompt: "使用 $math-core-definitions 处理以下一个或多个包含 main.tex 和书籍 PDF 的文件夹，在每个文件夹生成 core_definitions.tex。"

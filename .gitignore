@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.core-definitions-work/
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.pdf
+.DS_Store
+Thumbs.db
