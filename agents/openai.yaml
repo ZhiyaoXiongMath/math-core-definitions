@@ -1,4 +1,4 @@
 interface:
   display_name: "数学核心定义重要性排名"
-  short_description: "从书末索引筛选核心与重要概念，按重要性排名生成简朴的 LaTeX 名称清单"
-  default_prompt: "使用 $math-core-definitions 处理以下含 main.tex 和书籍 PDF 的分类文件夹，按重要性全局排名生成 core_definitions.tex；默认不分 section，最多 3 个。"
+  short_description: "从书籍索引或缓存筛选核心与重要概念，保留来源并全局排名，生成独立 LaTeX 清单"
+  default_prompt: "使用 $math-core-definitions，按内置最新四件套处理以下学科目录或带标签的 Index 材料，全局排名并生成 CLASS_core_definitions.tex；复用缓存、保留来源，覆盖前核验备份。"

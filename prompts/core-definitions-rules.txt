@@ -1,0 +1,207 @@
+CORE MATHEMATICAL DEFINITIONS: SELECTION AND GLOBAL RANKING
+
+Companions: prompt.txt, preamble.tex, template.tex.
+
+PURPOSE AND INPUT
+
+Produce an English list of core and important mathematical concept names, ranked
+within each user-designated subject. It supplies context for later mathematical
+evaluation; a concept's rank is not a theorem-quality score.
+
+The user determines the subject scope. The supplied books and Indexes determine
+which candidates have source support. Keep these two roles distinct: a specialist
+book does not redefine the subject, and incomplete sources do not justify adding
+concepts from general knowledge. Do not move books or impose a fixed taxonomy.
+
+Use the bibliography or manifest to identify the books. Use main.tex only for
+bibliographic identification and preserve it. If no manifest is supplied but the
+input grouping is clear, make a short inventory of the actual inputs. For uploaded
+files, use the user's subject labels; ask only about a genuinely ambiguous grouping.
+Do not exclude a listed book merely because its title differs from the subject.
+
+Let INPUT_DIR be the subject folder and CLASS its full name, preserving spaces
+and capitalization. With labelled attachments, use a working folder bearing that
+label. Save CLASS_core_definitions.tex in INPUT_DIR, replacing CLASS with the actual
+name. Process subjects independently. The document title is fixed.
+
+A. CHECK AND READ THE INDEX MATERIAL
+
+A1. Reuse existing Index text, page images and manifests. A conventional location
+is .core-definitions-work/indexes with index-manifest.json in its parent folder;
+reuse another clear existing layout. Resolve transferred cache paths against the
+supplied files, retaining book identity. Use relative paths in new portable records.
+An inaccessible historical path does not make a supplied cache unusable.
+
+A2. Check the material actually available: file identity, readable content, declared
+page coverage, continuations, columns, subentries and cross-references. Compare a
+supplied cache hash when available. A hash match confirms the supplied bytes, not
+the correctness of OCR, a previous audit, or completeness against an absent PDF.
+Record existing edition differences and coverage gaps; do not replace them with a
+blanket passed status.
+
+A3. If source PDFs are available, validate source identity and repair only missing,
+stale, unreadable or incomplete Index portions. Inspect only the cover matter,
+contents or bookmarks needed to identify the source and locate its Index, and the
+Index pages themselves. Extract text or OCR only those pages. Do not read book
+bodies, follow Index references into the body, extract whole-book text or obtain
+additional books unless the user requests it.
+
+A4. If only Index excerpts or caches are supplied, use them as the actual inputs.
+Distinguish present observations from inherited claims about original PDFs or page
+images. Do not require absent originals, claim to have verified them, or abandon
+readable supplied material because original-file checks cannot be repeated.
+Record whether each book has usable complete-as-supplied, partial, unavailable or
+unresolved material. Completion of this stage means every input has been accounted
+for, not that all missing evidence has been recovered.
+
+A5. Read all usable subject Indexes and concept-bearing notation indexes for every
+listed book. Batches are allowed: retain candidate names with their Index locations
+as each batch is read, then combine the batches before final selection and ranking.
+Do not rely on snippets, arbitrary samples or only familiar books. Bare symbols
+without identifiable concept names do not supply candidates. Multiple transcriptions
+of one Index are alternative evidence, not additional votes.
+
+A6. Build candidates from the actual Index entries, their parent/subentry structure
+and see/see also references. Mathematical knowledge may guide terminology, synonym
+recognition and importance, but cannot supply an absent candidate. An old generated
+list is not candidate evidence or a default order. Resolve uncertain text from the
+supplied Index context or images where available. If its meaning remains unresolved,
+leave that candidate out and retain a short factual uncertainty note. If a subject
+has no usable Index, report the gap and continue with other subjects.
+
+B. SELECT AT A CONSISTENT LEVEL
+
+B1. Use two internal tiers. Core concepts are the principal objects, structures,
+properties or invariants organizing the subject's main theories. Important concepts
+have an independent, substantial role in those theories, their major results or
+reusable methods. Index presence establishes candidate eligibility, not admission.
+A term is not important merely because it is needed for one local argument.
+
+B2. Objects, structures, conditions, invariants, constructions, decompositions,
+operators, equations and reusable methods may qualify. Exclude temporary notation,
+proof-local labels, isolated auxiliary terms, generic words, bare personal names,
+book titles, and theorem or conjecture titles as list items. Classify by mathematical
+role: an independently indexed concept or reusable tool may qualify under B1 even
+when conventionally stated as a theorem; a named assertion does not become a concept
+by shortening or relabelling its title. A theorem, conjecture or named formula alone
+is not evidence for a different concept. Do not reject a substantive eponymous
+concept merely because its name contains a person's name.
+
+B3. Each specialization or related construction must independently meet B1.
+Related but distinct concepts need not be merged, but neither are they automatically
+all admitted. Apply the same threshold across books and topics. Necessary generic
+background is not automatically core, and specialized concepts are not automatically
+unimportant. Do not use a total count, minimum length, book quota or topic quota.
+
+B4. Before ranking, revisit the principal indexed structures and methods for
+omissions, and reconsider marginal selections across topics. Check whether similar
+roles have been treated consistently. Do not fill a presumed gap with an unsupported
+term, or expand the list just to include every indexed variant. Keep only brief
+notes for genuinely unresolved or consequential decisions; no item-by-item essay
+or exhaustive rejection ledger is required.
+
+C. NORMALIZE WITHOUT CHANGING MEANING
+
+C1. Recover full names from parents, subentries and cross-references. Use standard
+English terminology, translating when necessary without printing bilingual pairs.
+Retain the object, category or hypothesis needed to identify the indexed concept.
+Do not add a more specific qualifier solely because the subject makes it plausible.
+A legitimate broad concept name may remain broad; ambiguity and generality are not
+the same. If different senses cannot be distinguished from available evidence,
+follow A6 rather than guessing or consulting body text.
+
+C2. Merge genuine synonyms and spelling variants within the subject, keeping one
+canonical name and the source links already found. Do not merge merely related
+constructions, general/special cases, different categories, or concepts equivalent
+only under additional hypotheses. Do not broaden an indexed term into a different
+structure. If synonymy is uncertain, do not force it. The same concept may appear
+in different subject lists.
+
+C3. One item names one concept. Do not bundle independent names, append synonym
+catalogues, definitions or explanatory sentences. Ordinary mathematical notation
+forming part of a concept name is allowed; formulas stating properties are not.
+
+D. RANK THE WHOLE SUBJECT LIST
+
+D1. Finish admission, naming and deduplication before deciding the final sequence.
+Place all core concepts before all important concepts. Within each tier, prioritize
+structural centrality to the subject's main theories and major results, the range
+of important results organized or connected, and a concept's essential role in
+substantial methods. Rank against the user's subject scope, with the source limits
+recorded separately.
+
+D2. Cross-book usage may inform judgment, but frequency, Index page counts, number
+of mentioning books and repeated editions are not voting weights. Generality,
+abstraction, difficulty, fame, name length and elementary status confer no automatic
+priority. Importance takes precedence over teaching order, prerequisite order,
+book order, alphabetical order and thematic grouping.
+
+D3. Combine topic or book batches and rank globally; do not concatenate their local
+lists. Compare across topics and separated parts of the sequence, including later
+principal concepts and long runs from one topic. Also check the leading concepts,
+comparable neighbors, general/special pairs and the tier boundary. A topic run is
+a reason to inspect the order, not an automatic error or a demand to alternate topics.
+
+D4. When no reliable importance distinction remains within a tier, use alphabetical
+order of canonical English names. Do not invent numerical scores or assert that
+positions separated only by tie-breaking represent a substantive difference. Display
+positions are ordinal, are not comparable across subjects, and are not theorem scores.
+
+D5. Keep a concise internal record linking each final rank and name to its tier and
+at least one identifiable Index entry: book identifier, cache file and a usable
+location, with the parent context where needed. Reuse an adequate existing format;
+no prescribed database or schema is required. Preserve source links for known
+synonym merges. The record must describe the delivered list, not an earlier draft.
+It is factual provenance, not private reasoning or an additional reader document.
+
+E. DOCUMENT AND LATEX CONTRACT
+
+E1. Copy template.tex and replace the sample item with the selected names. Preserve
+its class, packages, margins, title, author/date fields, list settings and framing.
+The template embeds preamble.tex; do not load that fragment again. When comparing
+the pre-document block, normalize line endings and ignore trailing blank lines
+only; keep all other content identical. Preserve the companions during generation.
+
+E2. Default to one enumerate with [series=definitions] and no sections. Write one
+\item per source line. Display automatic Arabic ranks starting at 1 and remove
+the sample Concept name. At most three broad English sections may divide natural
+consecutive blocks without moving entries. If sections are used, every section
+is followed by one enumerate: [series=definitions] first, then [resume=definitions].
+Do not mix sectioned and unsectioned lists or use manual item labels/counter resets.
+
+E3. The final TeX contains only the fixed title, optional section headings, ranks
+and English concept names. No explanations, definitions, citations, source pages,
+tier labels, scores, notes or reports, including in comments. No subsections,
+nested lists, tables, decorations, custom macros, external inputs or new packages.
+Encode accents and necessary notation using ordinary LaTeX supported by the supplied
+preamble. The complete generated TeX is standalone, with no dependency on this
+prompt package, local skill or additional source file.
+
+F. CHECK, SAVE AND DELIVER
+
+F1. Review source support, naming, synonym handling, admission and global order;
+then check the internal record against the actual final items. Independently check
+template conformity, allowed content, one item per line, no placeholder or external
+inputs, section limits and continuous automatic numbering. Use an available checker
+when helpful, but do not assume one exists or treat its pass as mathematical proof.
+
+F2. Compile the actual complete output with a standard compiler supporting the
+template, such as pdfLaTeX. Select the intended file explicitly when needed and
+inspect the result for clipped text, missing glyphs and numbering defects. Do not
+compile the preamble, a bibliography or an old output as a substitute. Fix genuine
+errors. Distinguish successful checks, checks not performed and checks that failed;
+an unavailable compiler is different from a failed compilation. A successful build
+does not establish mathematical quality or source completeness.
+
+F3. Preserve source books, Index material, bibliographies and companion files.
+Before replacing an existing output, make and verify an unchanged, non-colliding
+backup in the working cache. Check a new candidate before replacing an accepted
+output; a checked candidate may be compiled under the target basename in a temporary
+directory and then copied unchanged. Do not mark a failed candidate as accepted.
+
+F4. Deliver one CLASS_core_definitions.tex per subject. Keep the working Index and
+provenance records for reuse without adding them to the reader-facing list. Deliver
+a PDF only when requested. Briefly disclose actual source gaps, unresolved material,
+known edition differences and checks not completed outside the TeX. A partial source
+set may support a qualified result; do not call it complete. Do not claim original
+PDF verification, body reading or an end-to-end test that was not performed.

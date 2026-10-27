@@ -2,39 +2,37 @@
 
 English | [中文](README.md)
 
-A Codex skill for readers and researchers who need concise lists of mathematical concepts. Provide one or more local folders containing a main.tex bibliography and mathematical book PDFs. The skill first extracts and caches each book's back-of-book index, then selects, deduplicates and globally ranks concepts by importance into core_definitions.tex inside each input folder.
+A Codex skill for readers and researchers who need concise, source-supported lists of mathematical concepts. Supply subject folders, clearly labelled attachments, book PDFs, Index excerpts or existing Index caches. The skill checks the available material, reads all usable indexes, and selects, deduplicates and globally ranks core and important English concept names within each user-designated subject.
 
-The output contains continuous rank numbers, English names of core and important mathematical concepts, and optional broad English topic headings, without explaining the definitions. Each folder represents a category chosen by the user and is processed and ranked independently.
+Each subject produces one standalone `CLASS_core_definitions.tex`, where `CLASS` is the full subject-folder name, preserving spaces and capitalization. The document contains a fixed title, automatic rank numbers, concept names and optional broad English section headings. `main.tex` and original PDFs are optional when usable Index material is supplied.
 
-Current version: 0.2.0, sourced from metadata.version in SKILL.md.
+Current version: **0.3.0**, from `metadata.version` in [SKILL.md](SKILL.md).
 
 ## Features
 
-- Matches book PDFs using citation keys, MR numbers, titles and authors in main.tex.
-- Reads index pages and limited locating material, without reading the full body, extracting full-book text or running full-book OCR.
-- Preserves index page references, subentries and cross-references; caches provenance and processing status, and reuses valid caches.
-- Selects core and important concepts from the indexes, normalizes English terminology, and merges synonyms and duplicates within each category.
-- Places core definitions before important definitions, with descending importance within each tier; continuous numbering starts at 1, the highest rank.
-- Uses a fixed article template with enumerate entries. No sections by default, at most 3; sectioning must not change the global order or restart numbering.
-- Includes a read-only Python format checker for the template, section limit, continuous-numbering syntax, duplicate entries and unfilled example content.
-- Bundles standalone two-stage Markdown prompts, a template and a checker that can be used without installing the skill.
-- Produces one independent list per input folder. New chats are created only when explicitly requested.
+- Identifies books using a bibliography, manifest or inventory of the actual inputs; preserves the user's subject grouping.
+- Reuses readable Index caches, resolves transferred cache paths against supplied files, and repairs only affected Index portions when source PDFs are available.
+- Reads all usable subject indexes and concept-bearing notation indexes. PDF access is limited to Index pages and the small amount of cover matter, contents or bookmarks needed for identification and location; no body reading or whole-book extraction/OCR.
+- Applies a consistent admission threshold, recovers full names from Index context, and merges genuine synonyms without changing mathematical meaning. There are no book, topic or length quotas.
+- Ranks all core concepts before all important concepts, then orders each tier by structural importance to the user's subject. Alphabetical order breaks ties only when no reliable importance distinction remains.
+- Requires a concise internal provenance record linking every final rank, name and tier to an identifiable Index entry: book identifier, cache file, usable location and necessary parent context. Known synonym-source links are retained.
+- Uses a fixed LaTeX template with no sections by default and at most three; sectioning preserves the global order and continuous automatic numbering.
+- Checks a candidate before replacement and preserves any existing output in a unique, byte-verified backup in the working cache.
+- Includes a Python structural checker and a standalone prompt package usable without installing the skill.
 
-This is a skill workflow executed by Codex, not a standalone automated PDF extraction program. The script checks output formatting; the model performs the mathematical selection.
-
-The ranking provides concept-importance context for later theorem evaluation. It prioritizes structural roles in the category's central problems, main theories, major theorems and key methods, rather than mechanically using frequency, difficulty or teaching order. Ranks are not numerical scores or direct measures of theorem quality, and ranks across categories do not share a calibrated scale.
+This is a workflow executed by Codex, not an automated PDF extraction application. The model performs the mathematical selection. The user's subject determines importance; the supplied Index entries determine which candidates have evidence. Frequency, repeated editions, fame, difficulty and teaching order are not ranking weights. Ranks are ordinal positions within one subject, not numerical importance scores, cross-subject measurements or theorem-quality scores.
 
 ## Requirements
 
 - A Codex environment with local file access and command execution.
-- Python 3 for the format checker, which uses only the standard library.
-- PDF page-reading and text-extraction tools. Scanned indexes also require page rendering and OCR capabilities.
-- A LaTeX compiler for final validation, such as Codex's compile_latex_document tool or a local LaTeX installation. The template uses article, fontenc, inputenc, geometry, amsmath, amssymb and enumitem.
-- Your own main.tex and corresponding book PDFs. This repository contains no books, extracted index data or generated results.
+- Python 3 for the read-only checker; it uses only the standard library.
+- PDF page-reading and text-extraction tools when PDFs are supplied. Scanned or damaged Index pages also need rendering/OCR tools. Cache-only inputs do not require absent original PDFs.
+- A standard LaTeX compiler such as **pdfLaTeX**, plus a PDF viewer or renderer for inspecting the compiled result. The template uses `article`, `cmap`, `fontenc`, `inputenc`, `geometry`, `amsmath`, `amssymb` and `enumitem`.
+- Your own source material. This repository does not include books, extracted book indexes or generated subject lists.
 
 ## Installation
 
-Clone the repository into the Codex skills directory under the name math-core-definitions. If that directory already exists, inspect its contents before changing it; do not overwrite it blindly.
+Clone the repository into the Codex skills directory under the name `math-core-definitions`. If that directory already exists, inspect its contents before changing it; do not overwrite it blindly.
 
 PowerShell:
 
@@ -60,44 +58,43 @@ mkdir -p "$skills_root"
 git clone https://github.com/ZhiyaoXiongMath/math-core-definitions.git "$skills_root/math-core-definitions"
 ~~~
 
-Then invoke $math-core-definitions in Codex and supply the source folder paths. The default workflow has no fixed subject, book count, model or machine-specific path.
+Invoke `$math-core-definitions` in Codex and supply the input paths or clearly labelled attachments. No fixed subject, book count or model is required. New chats are created only when explicitly requested.
 
 ## Usage and input/output example
 
-Prepare your materials, for example:
+Example input layout, combining a PDF-based subject and a cache-only subject:
 
 ~~~text
 library/
-├── topology/
+├── Differential Geometry/
 │   ├── main.tex
-│   └── algebraic-topology.pdf
-└── geometry/
-    ├── main.tex
-    └── differential-geometry.pdf
+│   └── differential-geometry.pdf
+└── Topology/
+    └── .core-definitions-work/
+        ├── index-manifest.json
+        └── indexes/
+            └── topology-index.txt
 ~~~
 
-These filenames illustrate the layout; you provide the actual books. In a Codex chat that can access those relative paths, enter:
+In a Codex chat that can access these paths:
 
 ~~~text
 $math-core-definitions
-Please process these folders:
-./library/topology
-./library/geometry
+Please process these subject folders:
+./library/Differential Geometry
+./library/Topology
 ~~~
 
-Expected additions inside each input directory:
+Expected reader-facing outputs:
 
 ~~~text
-core_definitions.tex
-.core-definitions-work/
-├── index-manifest.json
-└── indexes/
-    └── Per-book index text and any necessary index-page images
+library/Differential Geometry/Differential Geometry_core_definitions.tex
+library/Topology/Topology_core_definitions.tex
 ~~~
 
-The final deliverables are two core_definitions.tex files. Each list combines available indexes from its own directory without reclassifying material across folders. The same concept may appear in different categories. The original main.tex and PDFs are preserved.
+The filename retains the complete folder name, including the space and capital letters in `Differential Geometry`. For attachments labelled `Differential Geometry`, use a working folder with that same label. Working Index material, input-status records, final provenance and any verified backups remain in `.core-definitions-work` or an adequate existing cache layout. Source books, bibliographies and supplied Index material remain unchanged.
 
-Example entry structure in the generated document:
+The generated list uses entries such as:
 
 ~~~latex
 \begin{enumerate}[series=definitions]
@@ -106,45 +103,44 @@ Example entry structure in the generated document:
 \end{enumerate}
 ~~~
 
-This illustrates the expected structure. It does not mean the repository includes those books, extraction has been run against the example PDFs, or the example concepts' actual ranks have been verified. Actual ranking must follow each folder's index evidence and selection rules.
+These filenames and entries illustrate the expected interface and structure; they are not supplied books or a verified ranking. Actual names and positions must follow the available Index evidence and subject-specific review. Different subjects are processed independently, and the same concept may occur in more than one list.
 
-## Standalone prompts without skill installation
+## Standalone prompt package
 
-After obtaining the repository, use the standalone prompt pack described in [prompts/README.md](prompts/README.md). You still need an execution environment with local file access and PDF/TeX capabilities. The complete pack can be copied and reused independently of the skill installation directory.
+Use [prompts/README.md](prompts/README.md) without installing the skill. The complete package is independent of the skill installation directory and contains the mandatory quartet: `core-definitions-rules.txt`, `prompt.txt`, `preamble.tex` and `template.tex`.
 
 ~~~text
 Execute ./prompts/workflow.md.
 INPUT_DIRS:
-- ./library/topology
-- ./library/geometry
-MODE: direct execution
+- ./library/Differential Geometry
+- ./library/Topology
 ~~~
 
-Each folder still runs index caching before ranking and produces one core_definitions.tex. You can also invoke [stage one](prompts/01-extract-indexes.md) alone to cache indexes, or [stage two](prompts/02-index-to-core-definitions.md) on existing caches to repeat selection and ranking. The stage-two Markdown includes the complete template and can be supplied on its own.
+[Stage one](prompts/01-extract-indexes.md) handles input accounting and Index material; [stage two](prompts/02-index-to-core-definitions.md) handles selection, ranking and delivery after that material has been checked and read. These Markdown files are concise entrypoints, not replacements for the quartet. Supply all four companion files even when invoking only one stage.
 
-## Template, validation and future changes
+## Rules, template and validation
 
-- assets/core_definitions.tex is the fixed template. Its preamble, title and page settings stay unchanged; only ranked concept names and optional topic headings are filled.
-- references/extract-indexes.md defines index extraction and caching.
-- references/select-definitions.md defines selection, integration, global importance ranking and output requirements.
-- scripts/validate_output.py checks the resulting TeX without modifying it. Example:
+Read the complete authoritative quartet before processing: [rules](references/core-definitions-rules.txt), [prompt](references/prompt.txt), [preamble](assets/preamble.tex) and [template](assets/template.tex). The stage references provide operational guidance without overriding those rules. Preserve all four files during generation.
+
+Copy `assets/template.tex` and replace its concept-list body. It already embeds the preamble; do not load `preamble.tex` again. The result is standalone and has no dependency on the skill or prompt package. Keep the class, packages, margins, fixed title, author/date fields, list settings and document framing. Pre-document comparison normalizes line endings and ignores trailing blank lines only.
+
+Check a generated candidate from the repository root, for example:
 
 ~~~sh
-python scripts/validate_output.py path/to/core_definitions.tex
+python scripts/validate_output.py "library/Differential Geometry/Differential Geometry_core_definitions.tex"
 ~~~
 
-After the format check, the skill validates compilation with an available LaTeX tool. Select core_definitions.tex explicitly so the compiler does not use the adjacent main.tex instead. Internal compilation previews are not delivered as PDFs.
+The checker verifies structural formatting, including the fixed preamble, zero to three sections, continuous rank syntax and forbidden structural commands. It cannot establish concept-only English content, source support, synonym equivalence, mathematical importance or completeness. Review those separately and match the provenance record to the actual final list.
 
-If sections are needed, form the global ranking first, then split it into at most 3 natural, contiguous blocks. Each section has exactly one enumerate list: the first uses [series=definitions], and subsequent lists use [resume=definitions]. If natural sections cannot preserve the ranking, use the default unsectioned list.
+Compile the actual complete candidate with a compatible compiler such as pdfLaTeX, explicitly selecting its filename. Inspect the rendered pages for clipped text, missing glyphs and numbering defects. A temporary directory may use the target basename before the checked file is copied unchanged into place. Do not substitute `main.tex`, the preamble fragment or an old output for this check. Record successful, unperformed and failed checks separately; an unavailable compiler is different from a failed build.
 
-This version has validated skill structure, compilation of the template and zero-/three-section examples, and the format checker's acceptance/rejection behavior. End-to-end extraction from real mathematical books and mathematical ranking quality are not automated tests.
+Before replacing an existing accepted output, create a non-colliding backup in the working cache and verify byte equality. Do not accept a failed candidate. Deliver one TeX file per subject; deliver a PDF only when requested. Disclose actual source gaps, unresolved material, edition differences and incomplete checks briefly outside the TeX.
 
-When refining the output format, update the template, second-stage instructions and checker in both the skill and standalone prompt pack together.
+Validation for this version included 14 checker test methods and a synthetic cache-only workflow that produced a 17-item list, compiled it with pdfLaTeX and inspected the rendered result. This does not establish real-book extraction coverage or mathematical ranking quality. When the user requests a rules update, keep the skill, standalone quartet, guides and checker synchronized.
 
 ## Scope and limitations
 
-- Index means the mathematical subject index at the back of a book, not the table of contents.
-- The list covers candidates represented in the extracted indexes; it cannot guarantee coverage of definitions omitted from those indexes.
-- Missing PDFs, indexes that cannot be located and unreadable pages are recorded accurately while available material is processed. If no index is available, the skill does not fabricate a list from general knowledge.
-- Books are not downloaded automatically. Results contain no definition bodies, page references, citations, tier labels, numerical scores or importance explanations; no PDF or audit report is delivered.
-- The format checker cannot determine mathematical importance, ranking correctness, synonym equivalence or completeness. The model must review those against the index evidence.
+- An Index is a book's subject index, not its table of contents. All usable relevant Index material must be read; snippets, arbitrary samples and old generated lists are not candidate evidence.
+- Readable caches remain usable when original PDFs are absent. A matching hash proves supplied bytes, not OCR correctness or completeness against an absent original. Material may be complete as supplied, partial, unavailable or unresolved.
+- Partial sources can support a qualified result, but cannot justify a claim of complete subject coverage. If no usable Index exists for a subject, report the gap and continue with the others; do not add concepts from general knowledge.
+- No automatic book downloads or body reading. Final TeX contains no definitions, explanations, citations, source pages, tier labels, scores or reports, including in comments. Provenance is retained internally, not added to the reader-facing list.

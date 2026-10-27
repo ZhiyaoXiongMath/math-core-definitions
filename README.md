@@ -2,39 +2,35 @@
 
 [English](README.en.md) | 中文
 
-面向需要整理数学概念清单的读者和研究者的 Codex skill。输入一个或多个含 main.tex 参考书目和数学书籍 PDF 的本地文件夹；技能先提取并缓存各书书末 Index，再筛选、去重、按重要性全局排名，在每个文件夹内生成 core_definitions.tex。
+面向需要整理数学概念清单的读者和研究者的 Codex skill。按用户指定的学科范围，从全部可用书籍 Index 中筛选核心与重要概念、规范英文名称并全局排名。每个学科独立生成可编译的 `CLASS_core_definitions.tex`，只列自动编号和概念名称，不解释定义。
 
-输出只包含连续排名编号、核心与重要数学概念的英文名称，以及可选的宽泛英文主题标题，不解释定义。各文件夹代表使用者预先划分的类别，独立处理和排名。
+当前版本：**0.3.0**，以 [SKILL.md](SKILL.md) 的 `metadata.version` 为准。
 
-当前版本：0.2.0，版本来源为 SKILL.md 的 metadata.version。
+## 主要功能与边界
 
-## 主要功能
+- 接受书籍 PDF、Index 摘录、转移缓存及带明确学科标签的附件。`main.tex` 和原 PDF 均非必需；有书目或 manifest 时用来识别书籍，没有时盘点实际输入。
+- 复用可读缓存，重定位历史路径。有 PDF 时仅修复受影响的索引部分；只读必要的封面、目录、书签和 Index 页，不读正文、不做整书提取或 OCR，不自动下载书籍。
+- 读完全部可用主题索引及含概念名称的符号索引，保留父子条目和交叉引用。所供 Index 决定候选依据，用户学科范围决定重要性；不从常识或旧生成清单补候选。
+- 统一准入标准，合并真正同义项；每个特例、构造和可复用工具须独立达到核心或重要标准，不设数量、书籍或主题配额。
+- 所有核心概念先于所有重要概念，各层按对主要理论、重大结果和方法的结构性作用排序。仅在无法可靠区分重要性时按规范英文名字母顺序打破并列。
+- **必须保留内部来源记录**：将最终名次、名称、层次对应到至少一个真实 Index 条目的书籍标识、缓存文件和可用位置，并保留已知同义合并的来源链接。
+- 使用固定模板；默认无 section，最多 3 个宽泛英文 section，只能切分既有排名，不能重排条目或重置编号。一项一源码行。
+- 覆盖旧结果前创建不冲突的备份并核验字节一致；先检查候选再替换。保留来源文件、索引和工作记录，PDF 仅在用户要求时交付。
+- 提供只读 Python 格式检查器和可独立复制使用的[提示词包](prompts/README.md)。
 
-- 按 main.tex 中的引用键、MR 编号、书名和作者匹配书籍 PDF。
-- 仅提取索引及少量定位材料，不通读正文、不提取整书文本、不对整书 OCR。
-- 保留索引页码、子条目和交叉引用，缓存来源及处理状态；有效缓存可复用。
-- 根据 Index 筛选核心及重要概念，使用标准英文名称，在类别内部整合同义词和重复项。
-- 核心定义在前、重要定义在后，各层次按重要性递减排序；连续编号从 1 开始，1 为最高。
-- 按固定 article 模板输出 enumerate 名称列表。默认不分 section，最多 3 个；分段不能改变全局排名或重置编号。
-- 提供只读的 Python 格式检查器，检查模板、章节上限、连续编号语法、重复项及示意占位内容。
-- 附带可独立使用的两阶段 Markdown 提示词、模板和检查器，无需安装技能即可调用。
-- 多目录时，每个目录生成一份独立清单。只有使用者明确要求时才创建新聊天。
-
-这是由 Codex 执行的技能工作流，不是独立运行的 PDF 自动提取程序。脚本负责格式检查，数学筛选由模型完成。
-
-排名用于为后续定理评价提供概念重要性参考。优先考虑概念对本类别中心问题、主要理论、主要定理及关键方法的结构性作用，不以出现频率、难度或教学先后机械排序。名次不是数值分数，不直接代表定理质量，跨类别的名次也不是统一尺度。
+这是由 Codex 执行的技能工作流；脚本只检查格式，数学筛选与来源复核由模型完成。名次是学科内的序数，不是数值评分，不跨学科比较，也不代表具体定理的质量、创新性或证明深度。频次、难度、基础性和教学顺序不提供自动优先权。
 
 ## 环境要求
 
-- 能读取本地文件并执行命令的 Codex 环境。
-- Python 3：运行格式检查器，仅使用标准库。
-- 可用的 PDF 页面读取和文本提取工具；扫描索引另需索引页渲染和 OCR 能力。
-- 用于最终验证的 LaTeX 编译工具，例如 Codex 的 compile_latex_document，或已安装的 LaTeX 环境。模板使用 article、fontenc、inputenc、geometry、amsmath、amssymb、enumitem。
-- 使用者自行提供 main.tex 和对应书籍 PDF。本仓库不包含书籍、索引数据或生成结果。
+- 能读取材料并执行命令的 Codex 环境。
+- Python 3：格式检查器仅使用标准库，不需要额外 Python 包。
+- 处理原 PDF 时需要 PDF 页面读取和文本提取工具；扫描索引另需索引页渲染与 OCR 能力。只有可读 Index 缓存时，不要求补交原 PDF。
+- 用于验证实际输出的标准 LaTeX 编译器，例如 pdfLaTeX，以及 PDF 渲染或查看工具。模板使用 `article`、`cmap`、`fontenc`、`inputenc`、`geometry`、`amsmath`、`amssymb`、`enumitem`。
+- 使用者自行提供资料。本仓库不包含书籍、提取出的 Index 或生成清单。
 
 ## 安装
 
-将仓库克隆为 Codex skills 目录中的 math-core-definitions。若已存在同名目录，先检查现有内容，不要直接覆盖。
+将仓库克隆为 Codex skills 目录中的 `math-core-definitions`。若已存在同名目录，先检查现有内容，不要直接覆盖。
 
 PowerShell：
 
@@ -60,44 +56,43 @@ mkdir -p "$skills_root"
 git clone https://github.com/ZhiyaoXiongMath/math-core-definitions.git "$skills_root/math-core-definitions"
 ~~~
 
-随后在 Codex 中调用 $math-core-definitions，并提供资料文件夹路径。技能的默认流程不依赖固定学科、书籍数量、模型或机器专属路径。
+随后在 Codex 中调用 `$math-core-definitions` 并提供资料路径或带明确学科标签的附件。默认不创建新聊天。
 
 ## 使用与输入输出示例
 
-准备资料，例如：
+以下是布局示例，实际资料由使用者提供；第二个学科仅有缓存：
 
 ~~~text
 library/
-├── topology/
+├── Differential Geometry/
 │   ├── main.tex
-│   └── algebraic-topology.pdf
-└── geometry/
-    ├── main.tex
-    └── differential-geometry.pdf
+│   └── differential-geometry.pdf
+└── Topology/
+    └── .core-definitions-work/
+        ├── index-manifest.json
+        └── indexes/
+            └── topology-index.txt
 ~~~
 
-示例文件名仅说明目录布局，实际书籍由使用者提供。在能访问这些相对路径的 Codex 聊天中输入：
+在能访问这些路径的 Codex 聊天中输入：
 
 ~~~text
 $math-core-definitions
-请处理以下文件夹：
-./library/topology
-./library/geometry
+请处理以下学科目录：
+./library/Differential Geometry
+./library/Topology
 ~~~
 
-预期在每个输入目录新增：
+预期交付：
 
 ~~~text
-core_definitions.tex
-.core-definitions-work/
-├── index-manifest.json
-└── indexes/
-    └── 各书的索引文本及必要索引页图像
+library/Differential Geometry/Differential Geometry_core_definitions.tex
+library/Topology/Topology_core_definitions.tex
 ~~~
 
-最终交付是两份 core_definitions.tex。每份清单整合本目录的可用索引，不跨文件夹重新归类；同一概念可以出现在不同类别中。原 main.tex 和 PDF 保留不变。
+`CLASS` 取学科文件夹的**完整名称，保留空格和大小写**；文档标题始终为 `Core Mathematical Definitions`。带标签附件使用该标签命名工作目录。每个目录独立筛选和排名，不移动书籍或跨目录重分类；同一概念可出现在不同学科清单中。
 
-生成文档内的条目形式示例：
+工作缓存保留索引、材料状态、最终来源对应记录及必要备份，可沿用合理的已有布局，不强制固定 schema。生成列表的结构例如：
 
 ~~~latex
 \begin{enumerate}[series=definitions]
@@ -106,45 +101,35 @@ core_definitions.tex
 \end{enumerate}
 ~~~
 
-示例展示预期结构，不代表仓库附带了上述书籍、已对这些示例 PDF 完成提取，或已验证示例概念的实际名次。实际排名必须依据各目录的索引材料和筛选规则。
+此片段只展示格式，不声称已从示例 PDF 提取材料或验证这些概念的实际名次。实际名单必须有 Index 依据。
 
 ## 不安装技能：使用独立提示词
 
-获取仓库后，可直接使用 [prompts/README.md](prompts/README.md) 中的独立提示词包；同样需要可访问本地资料并处理 PDF、TeX 的执行环境。完整包可复制复用，不依赖技能安装目录。
+[独立提示词包](prompts/README.md) 包含同版完整四件套、阶段入口和检查器，可将整个 `prompts/` 文件夹复制到其他位置使用，不依赖技能安装目录。
 
 ~~~text
-请执行 ./prompts/workflow.md。
+请执行 ./prompts/workflow.md，完整读取同目录四件套。
 INPUT_DIRS：
-- ./library/topology
-- ./library/geometry
-MODE：直接执行
+- ./library/Differential Geometry
+- ./library/Topology
 ~~~
 
-每个目录仍依次完成索引缓存和排名，输出一份 core_definitions.tex。也可单独调用 [第一步](prompts/01-extract-indexes.md) 缓存 Index，或在已有缓存上调用 [第二步](prompts/02-index-to-core-definitions.md) 重新筛选和排名。第二步 Markdown 内嵌完整模板，可单独提供给执行者。
+[第一步](prompts/01-extract-indexes.md) 可单独用于核对、提取和缓存 Index；[第二步](prompts/02-index-to-core-definitions.md) 可用于基于现有材料筛选、排名和生成文件。两个入口都必须连同四件套使用，阶段 Markdown 不内嵌或替代完整规范。
 
-## 模板、验证与后续调整
+## 规范、检查与验证范围
 
-- assets/core_definitions.tex 是固定模板。导言区、标题及页面设置保持一致，只填写已排名的名称和可选主题标题。
-- references/extract-indexes.md 规定索引提取和缓存。
-- references/select-definitions.md 规定筛选、整合、全局重要性排名和输出要求。
-- scripts/validate_output.py 只读检查生成的 TeX。运行示例：
+开始任务前完整读取 [core-definitions-rules.txt](references/core-definitions-rules.txt)、[prompt.txt](references/prompt.txt)、[preamble.tex](assets/preamble.tex) 和 [template.tex](assets/template.tex)。四件套是完整规范，辅助说明不能缩减其中规则；生成期间保持原样。模板已内嵌导言区，不再次加载 `preamble.tex`，生成的完整 TeX 不依赖技能或提示词包。
+
+在仓库根目录对实际完整候选运行检查，例如：
 
 ~~~sh
-python scripts/validate_output.py path/to/core_definitions.tex
+python scripts/validate_output.py "library/Differential Geometry/Differential Geometry_core_definitions.tex"
 ~~~
 
-格式检查通过后，技能继续用可用的 LaTeX 工具检查编译。编译应明确选择 core_definitions.tex，避免误编译同目录的 main.tex。内部编译预览不作为 PDF 交付。
+格式检查涵盖固定模板、0–3 个 section、连续自动编号语法、一项一行、占位项及常见禁用命令。之后明确选择同一完整候选，用 pdfLaTeX 等编译并查看渲染结果，检查截断、缺字和编号。可先在工作缓存临时目录以最终文件名编译，检查后原样复制；不要用 `main.tex`、导言片段或旧输出代替。区分通过、未执行和失败，编译器不可用不等于编译失败。
 
-如需分段，先形成全局排名，再将其切成最多 3 个自然、连续的大块。每节恰有一个 enumerate，首个列表使用 [series=definitions]，后续列表使用 [resume=definitions]。无法保持排名自然分段时，直接采用默认的无 section 列表。
+本版本已通过 14 个格式检查器测试方法，并完成一个仅有缓存的合成材料示例：17 个条目、最终来源对应、旧文件备份、实际 pdfLaTeX 编译和渲染检查。该验证不代表真实书籍的端到端提取测试，也不证明数学排名质量；测试产生的私人工作文件不随仓库发布。
 
-本版本已验证技能结构、模板和无章节/三章节示例编译，以及格式检查器的接受/拒绝行为；未将真实数学书籍的端到端提取或数学排名质量作为自动化测试。
+索引可能有缺页、OCR 疑点或版次差异，应如实记录并在交付时简短披露。缓存哈希相符只证明字节一致，不能证明 OCR 正确或缺席原书的完整性。部分材料可支持有限范围结果，不能称为完整；没有任何可用 Index 时不生成清单。TeX 中不写解释、来源、层次、分数或报告，内部记录留在工作缓存。
 
-后续细化输出格式时，应同步修改技能和独立提示词包中的模板、第二步说明和格式检查器。
-
-## 范围与限制
-
-- Index 指书末数学主题索引，不是书前目录。
-- 清单覆盖已提取索引中的候选概念，不保证覆盖正文里未被索引收录的全部定义。
-- 缺少 PDF、未定位到索引或部分页面不可读时，记录真实状态并继续处理可用材料；没有任何可用索引时不凭常识生成清单。
-- 不自动下载书籍。生成结果不包含定义内容、页码、引用、等级标签、数值评分或重要性说明，也不额外交付 PDF 或审查报告。
-- 格式检查不能判定数学概念的重要性、排名正确性、同义关系或筛选是否完整，这些仍需模型进行索引依据下的审查。
+修改规范时应同步更新技能、独立提示词包的四件套、阶段说明及检查器。

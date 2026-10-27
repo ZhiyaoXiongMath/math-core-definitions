@@ -1,0 +1,40 @@
+CORE MATHEMATICAL DEFINITIONS FROM BOOK INDEXES
+
+Read core-definitions-rules.txt, preamble.tex and template.tex completely. Use these
+companions as supplied and keep them unchanged while producing the subject lists.
+
+For each user-designated subject, use all supplied usable book Indexes to select
+core and important English concept names and rank them globally. The user's subject
+scope determines importance; the supplied Indexes determine candidate support.
+Do not substitute book order, topic order, frequency or an old generated list.
+
+First account for every input and check existing Index material. Reuse readable,
+reliable caches. Repair only affected Index portions when the necessary source is
+available. If only caches are supplied, assess them as supplied evidence and state
+what cannot be verified against originals. Do not read book bodies or perform
+whole-book extraction/OCR.
+
+Read all usable Index text, including concept-bearing notation indexes. You may
+retain candidates and their source locations in batches. After all batches, apply
+one consistent admission threshold, normalize names without changing meaning and
+merge genuine synonyms. Each retained specialization or tool must independently
+qualify; neither length quotas nor automatic inclusion of every variant are allowed.
+
+Rank all core concepts before all important concepts. Review cross-topic order,
+later principal concepts and the tier boundary. Use alphabetical tie-breaking only
+where no reliable importance difference remains. Keep a concise internal mapping
+from final ranks/names and tiers to actual Index entries, using an existing adequate
+record format when available.
+
+Copy template.tex, replacing only its concept-list body. Default to one continuous
+list without sections; any allowed sectioning must preserve the established order.
+Print only the fixed title, permitted headings, automatic ranks and English concept
+names. The generated TeX must compile independently of this package.
+
+Use the full subject-folder name as CLASS and save CLASS_core_definitions.tex in
+that folder. For clearly labelled attachments, use the same label as the working
+folder name. Preserve existing outputs with a verified backup before replacement.
+Check content, provenance, format and actual compilation, and inspect the rendered
+result. Keep passed, unverified and failed checks distinct. Deliver one TeX per
+subject; disclose material gaps briefly outside it. Do not deliver PDFs unless
+requested. Concept ranks supply context, not theorem-quality scores.

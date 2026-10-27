@@ -1,118 +1,111 @@
-# 数学定义名称提取与重要性排名提示词
+# 数学核心定义独立提示词包 / Standalone prompt pack
 
-版本：0.2.0。提供一个或多个含 main.tex 与数学书籍 PDF 的文件夹，即可在每个目录生成 core_definitions.tex。文件夹已代表用户分好的大类。
+[中文](#中文) | [English](#english)
 
-流程严格分两步：先提取并缓存各书书末 Index，再根据 Index 筛选核心定义和重要定义、合并同义项，并按重要性全局排序。
+## 中文
 
-排序用于为后续定理评价提供概念重要性参考，不直接计算定理质量。输出只包含英文名称和连续排名编号，不写定义、解释、等级标签或数值评分。
+版本：**0.3.0**。本目录可整体复制使用，不依赖已安装的 skill。执行环境仍需读取所供材料；格式检查器需要 Python 3 标准库，最终编译与目视检查需要 pdfLaTeX 等标准编译器及 PDF 渲染或查看工具。处理原 PDF 时才需要相应页面提取工具，扫描 Index 另需页面 OCR。
 
-## 本版的排序与分段规则
+本包按用户指定学科，从全部可用 Index 中筛选核心与重要英文概念名并全局排名。接受书籍 PDF、仅有 Index 的摘录或缓存、带明确标签的附件，不要求必有 `main.tex` 或原 PDF。不读正文，不以常识或旧清单补候选；名次是学科内序数，不是定理评分，也不能跨学科比较。
 
-- 核心定义在前，重要定义在后，各层次内按重要性递减排列。
-- 主要依据是概念对本类别中心问题、主要理论、主要定理与关键方法的结构性作用，不以出现频率、难度或教学先后机械排名。
-- 编号从 1 连续递增，1 为最高；它表示顺序，不表示数值分数。
-- 默认不使用 section。确有必要时最多 3 个，3 是上限而不是目标。
-- 分段不能改变全局排名，编号不能在 section 中重置；无法自然分段时直接使用一份总列表。
-- 每个输入目录独立排名，不跨类别重新归类或删除重复概念。
+### 完整四件套与入口
 
-## 文件说明
+开始执行前必须完整读取以下四个文件，生成期间保持它们原样。它们共同构成完整规范，阶段 Markdown 不能单独代替其中任何文件。
 
 | 文件 | 用途 |
 | --- | --- |
-| [workflow.md](workflow.md) | 主入口，串联两步流程；用户要求时为各目录派发新对话。 |
-| [01-extract-indexes.md](01-extract-indexes.md) | 第一步，只提取和缓存 Index，可单独调用。 |
-| [02-index-to-core-definitions.md](02-index-to-core-definitions.md) | 第二步，完整的筛选、全局排名和输出提示词，内嵌模板，可单独调用。 |
-| [assets/core_definitions.tex](assets/core_definitions.tex) | 默认无 section 的固定 LaTeX 模板。 |
-| [scripts/validate_output.py](scripts/validate_output.py) | 检查模板、0–3 个 section 与连续编号语法。 |
-| README.md | 使用说明。 |
+| [core-definitions-rules.txt](core-definitions-rules.txt) | PURPOSE AND INPUT 与 A–F 全部具体规则。 |
+| [prompt.txt](prompt.txt) | 总体执行要求。 |
+| [preamble.tex](preamble.tex) | 固定导言区片段，不单独编译。 |
+| [template.tex](template.tex) | 完整模板，已内嵌导言区，不再次加载 `preamble.tex`。 |
+| [workflow.md](workflow.md) | 从材料核对到检查交付的完整流程入口。 |
+| [01-extract-indexes.md](01-extract-indexes.md) | 仅执行材料核对、Index 读取与缓存。 |
+| [02-index-to-core-definitions.md](02-index-to-core-definitions.md) | 在材料核对后筛选、排名、检查并生成 TeX。 |
+| [scripts/validate_output.py](scripts/validate_output.py) | 只读格式检查器，默认读取本目录 `template.tex`。 |
 
-整个文件夹可直接复制复用，不依赖已安装的 skill。两个阶段 Markdown 也能分别使用；只提供第二步 Markdown 时，可使用其中内嵌的完整模板。
+### 使用示例
 
-## 准备输入
-
-~~~text
-某个已分类的资料文件夹/
-├── main.tex
-├── 书籍一.pdf
-└── 书籍二.pdf
-~~~
-
-main.tex 确定书目范围。Index 指书末数学索引，书前目录只用于定位。不要通读正文，不要先提取整书文本再查找 Index，也不要进行整书 OCR。
-
-## 在当前对话执行
-
-替换路径后发送：
+向可访问文件的执行者提供整个包及材料，发送：
 
 ~~~text
-请执行 <提示词目录的绝对路径>/workflow.md。
-INPUT_DIR：<含 main.tex 和 PDF 的资料文件夹地址>
-MODE：直接执行
-
-先缓存 Index，再生成按重要性全局排名的 core_definitions.tex。
-默认不分 section，最多 3 个，排名编号连续。
-~~~
-
-多个目录时将 INPUT_DIR 改为 INPUT_DIRS，并逐行列出路径。
-
-## 派发独立新对话
-
-~~~text
-请执行 <提示词目录的绝对路径>/workflow.md。
+请执行 ./prompts/workflow.md，完整读取同目录四件套。
 INPUT_DIRS：
-- <第一个资料文件夹地址>
-- <第二个资料文件夹地址>
-
-MODE：每个目录派发一个新本地对话
-MODEL：gpt-6-astra
-THINKING：ultra
-
-每个对话依次完成 Index 缓存和核心定义重要性排名。
-默认不分 section，最多 3 个，编号跨 section 连续。
-返回新对话入口并跟进至交付。
+- ./library/Differential Geometry
+- ./library/Topology
 ~~~
 
-模型及推理档位可以在调用时指定，执行环境须核实支持情况。
-
-## 单独使用某一步
-
-仅提取索引：
+`Differential Geometry` 可包含书目和书籍 PDF；`Topology` 也可只有 `.core-definitions-work/indexes/` 与现有 manifest。预期输出分别为：
 
 ~~~text
-请执行 <提示词目录的绝对路径>/01-extract-indexes.md。
-INPUT_DIR：<资料文件夹地址>
-本次只提取并缓存 Index。
+library/Differential Geometry/Differential Geometry_core_definitions.tex
+library/Topology/Topology_core_definitions.tex
 ~~~
 
-已有索引，仅重新筛选和排名：
+`CLASS` 取学科文件夹完整名称，保留空格和大小写；带标签附件使用同标签工作目录。各学科独立处理。该例说明输入输出约定，不代表本包附带书籍或已验证示例排名。
+
+只需第一步时，将调用入口改为 `01-extract-indexes.md`；已有材料、只需重新筛选排名时改为 `02-index-to-core-definitions.md`。两者仍需完整四件套。已有缓存可位于其他清晰布局；不需要为调整排名而重提取有效 Index。
+
+### 检查与交付
+
+从本包目录运行，例如：
+
+~~~sh
+python scripts/validate_output.py "../library/Differential Geometry/Differential Geometry_core_definitions.tex"
+~~~
+
+最终 TeX 只含固定标题、允许的宽泛英文节标题、自动连续编号和英文概念名。默认无 section，最多 3 个且不能改变排名或重置编号。模板使用 `article`、`cmap`、`fontenc`、`inputenc`、`geometry`、`amsmath`、`amssymb`、`enumitem`，生成文件独立于本包。
+
+必须保留与最终名次、名称、层次对应的真实 Index 来源记录；覆盖旧输出前创建不冲突的备份并核验字节一致。先检查实际完整候选，再替换结果。格式检查不证明来源或数学质量，还需实际编译并检查截断、缺字和编号。通过、未执行和失败分别记录。
+
+每学科交付一个 TeX，PDF 仅在用户要求时交付。工作索引、来源记录和备份留在缓存；缺页、版次差异、未决材料及未完成检查在聊天中简短说明，不写进 TeX。缺席原件不能声称已验证，部分来源不能称完整，无可用 Index 时不编造清单。
+
+## English
+
+Version: **0.3.0**. Copy this entire directory to use it independently of an installed skill. The execution environment needs access to the supplied materials. The checker uses Python 3's standard library; compilation and visual inspection require a standard compiler such as pdfLaTeX and a PDF renderer or viewer. Source PDFs require page-reading/extraction tools, and scanned Index pages additionally require OCR.
+
+The pack selects core and important English concept names from all usable Indexes and ranks them globally within each user-designated subject. It accepts book PDFs, Index-only excerpts or caches, and clearly labelled attachments. Neither `main.tex` nor original PDFs are mandatory. Do not read book bodies or add unsupported candidates from general knowledge or old generated lists. Ranks are within-subject positions, not theorem scores or a scale shared across subjects.
+
+### Mandatory quartet and entrypoints
+
+Before execution, read [core-definitions-rules.txt](core-definitions-rules.txt), [prompt.txt](prompt.txt), [preamble.tex](preamble.tex) and [template.tex](template.tex) completely. Keep them unchanged during generation. Together they are the complete specification; no stage Markdown replaces any of these files. The complete template already embeds the preamble: do not load the fragment again or compile it on its own.
+
+- [workflow.md](workflow.md) runs the full workflow.
+- [01-extract-indexes.md](01-extract-indexes.md) only accounts for inputs and reads/caches usable Index material.
+- [02-index-to-core-definitions.md](02-index-to-core-definitions.md) selects, ranks, checks and saves the TeX after the input review.
+- [scripts/validate_output.py](scripts/validate_output.py) checks structural format without modifying the output. Its default template is `template.tex` in this directory.
+
+### Usage example
+
+Supply the pack and source materials to an executor with file access, then request:
 
 ~~~text
-请执行 <提示词目录的绝对路径>/02-index-to-core-definitions.md。
-INPUT_DIR：<资料文件夹地址>
-复用已有 Index，按重要性重新排名并生成 core_definitions.tex。
+Execute ./prompts/workflow.md and read the complete quartet beside it.
+INPUT_DIRS:
+- ./library/Differential Geometry
+- ./library/Topology
 ~~~
 
-缓存不在默认位置时可指定 INDEX_DIR 和 MANIFEST_PATH。不需要为调整排名规则重新读取书籍。
-
-## 输出与检查
+The first folder may contain a bibliography and book PDFs; the second may contain only `.core-definitions-work/indexes/` and an existing manifest. The expected outputs are:
 
 ~~~text
-资料文件夹/
-├── main.tex
-├── 原有书籍.pdf
-├── core_definitions.tex
-└── .core-definitions-work/
-    ├── index-manifest.json
-    └── indexes/
+library/Differential Geometry/Differential Geometry_core_definitions.tex
+library/Topology/Topology_core_definitions.tex
 ~~~
 
-使用完整提示词包时，可运行：
+`CLASS` is the full subject-folder name, preserving spaces and capitalization. For labelled attachments, use a working folder with that label. Process subjects independently. This example illustrates the input/output contract; no books or verified example rankings are included.
 
-~~~text
-python <提示词目录>/scripts/validate_output.py <资料目录>/core_definitions.tex
+For stage one alone, invoke `01-extract-indexes.md`. To repeat selection and ranking on existing material, invoke `02-index-to-core-definitions.md`. Both still require the complete quartet. Reuse other clear cache layouts and do not re-extract valid Indexes merely because the ranking rules change.
+
+### Checks and delivery
+
+From this package directory, for example:
+
+~~~sh
+python scripts/validate_output.py "../library/Differential Geometry/Differential Geometry_core_definitions.tex"
 ~~~
 
-检查器验证固定格式、章节上限和连续编号结构，不评判数学重要性；重要性顺序仍需对照索引和筛选规则复核。输出还需编译检查，不另交付 PDF。
+The final TeX contains only the fixed title, permitted broad English section headings, automatic continuous ranks and English concept names. Use no sections by default, at most three without reordering items or resetting ranks. The template uses `article`, `cmap`, `fontenc`, `inputenc`, `geometry`, `amsmath`, `amssymb` and `enumitem`; the generated file is independent of this pack.
 
-本版已统一文件名为 core_definitions.tex。若使用了旧版的 core-definitions.tex，新结果使用新文件名，旧文件不自动删除。
+Retain factual Index provenance corresponding to every final rank, name and tier. Before replacing an output, create a non-colliding backup and verify identical bytes. Check the actual complete candidate before replacement. The checker does not prove source support or mathematical quality: compile and visually inspect the candidate for clipping, missing glyphs and numbering. Record passed, unperformed and failed checks separately.
 
-索引缺失或不可读时如实记录并继续处理可用材料。基于 Index 的清单不声称覆盖正文中未被索引收录的全部定义。
+Deliver one TeX per subject; deliver PDFs only when requested. Keep working Indexes, provenance and backups in the cache. Briefly disclose source gaps, edition differences, unresolved material and incomplete checks outside the TeX. Do not claim to have verified absent originals or call partial sources complete; do not fabricate a list when no Index is usable.
